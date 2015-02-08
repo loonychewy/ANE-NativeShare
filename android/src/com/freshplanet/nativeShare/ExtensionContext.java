@@ -18,6 +18,7 @@
 
 package com.freshplanet.nativeShare;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -38,6 +39,11 @@ import com.adobe.fre.FREObject;
 import com.adobe.fre.FRETypeMismatchException;
 import com.adobe.fre.FREWrongThreadException;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -183,9 +189,27 @@ public class ExtensionContext extends FREContext
 			if( bitmap != null ){
 				Extension.log( "we have image" );
 				try {
-					String pathOfBmp = MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), bitmap, "air_native_share_media", "");
+					File nativeShareFile = new File(getActivity().getExternalFilesDir(null),"air_native_share_media.jpg");
+					String pathOfBmp = nativeShareFile.getAbsolutePath();
+					OutputStream os_ = null;
+					boolean isok = false;
+					try{
+						os_ = new FileOutputStream(nativeShareFile);
+						bitmap.compress(Bitmap.CompressFormat.JPEG, 90, os_);
+						os_.flush();
+						os_.close();
+						isok = true;
+					} catch (FileNotFoundException e) {
+						Extension.log( "saving jpg " + e.toString());
+					}catch (IOException e1) {
+						Extension.log( "saving jpg " + e1.toString());
+					} catch (Exception e2){
+						Extension.log( "saving jpg " + e2.toString());
+					} finally{
+						isok = true;
+					}
 					Extension.log( pathOfBmp );
-					Uri bmpUri = Uri.parse(pathOfBmp);
+					Uri bmpUri = Uri.fromFile(nativeShareFile);
 					sharingIntent.setType( "image/*" );
 					sharingIntent.putExtra( Intent.EXTRA_STREAM, bmpUri );
 				} catch( Exception e ) {

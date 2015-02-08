@@ -25,7 +25,7 @@ This ANE currently supports displaying an alert popup with:
     AirNativeShare.getInstance().showShare(myShareObject)
     ```
 
-Additionaly, on Android, you need to ask the following permission:
+Additionally, on Android 4.3 and below, you need to ask the following permission:
     
     ```
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
